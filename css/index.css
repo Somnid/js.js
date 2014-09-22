@@ -1,0 +1,13 @@
+body {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+  font-family: arial;
+}
+#console {
+  height: 600px;
+}
+#evaluate {
+  height: 25px;
+}
