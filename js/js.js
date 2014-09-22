@@ -41,7 +41,9 @@ var Js = (function(){
     this.currentCode += "ADD:V1,V0\n";
   }
   function subtract(){
-
+    this.readChar();
+    this.parseTerm();
+    this.currentCode += "SUB:V1,V0\n";
   }
   function readChar(){
     this.currentChar = this.textReader.readChar();
