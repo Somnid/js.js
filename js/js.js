@@ -5,17 +5,24 @@ var Js = (function(){
     js.currentChar = "";
     js.currentCode = "";
     bind(js);
+    js.setOps();
     return js;
   }
   function bind(js){
+    js.setOps = setOps.bind(js);
     js.evaluate = evaluate.bind(js);
     js.parseTerm = parseTerm.bind(js);
     js.parseExpression = parseExpression.bind(js);
     js.getNumber = getNumber.bind(js);
     js.readChar = readChar.bind(js);
-    js.parseOperation = parseOperation.bind(js);
     js.add = add.bind(js);
     js.subtract = subtract.bind(js);
+  }
+  function setOps(){
+    this.ops = {
+      "+" : this.add,
+      "-" : this.subtract
+    };
   }
   function evaluate(text){
     this.readChar();
@@ -23,17 +30,13 @@ var Js = (function(){
   }
   function parseExpression(){
     this.parseTerm();
-    this.currentCode += "SET:V1,V0\n"
-    this.parseOperation();
+    while(Object.keys(this.ops).indexOf(this.currentChar) != -1){
+      this.currentCode += "SET:V1,V0\n"
+      map(this.ops, this.currentChar);
+    }
   }
   function parseTerm(){
     this.currentCode += "SET:V0," + this.getNumber() + "\n";
-  }
-  function parseOperation(){
-    map({
-      "+" : this.add,
-      "-" : this.subtract
-    }, this.currentChar);
   }
   function add(){
     this.readChar();
