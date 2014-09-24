@@ -21,6 +21,7 @@ var Js = (function(){
     js.subtract = subtract.bind(js);
     js.multiply = multiply.bind(js);
     js.divide = divide.bind(js);
+    js.isAddOp = isAddOp.bind(js);
   }
   function setOps(){
     this.factorOps = {
@@ -37,14 +38,19 @@ var Js = (function(){
     this.parseExpression();
   }
   function parseExpression(){ //add operations
-    this.parseTerm();
-    while(Object.keys(this.factorOps).indexOf(this.currentChar) != -1){
+    if(this.isAddOp(this.currentChar)){
+      this.currentCode += "SET:V0,0\n";
+    }else{
+      this.parseTerm();
+    }
+    while(this.isAddOp(this.currentChar)){
       this.currentCode += "STACK_PUSH:V0\n"
       map(this.factorOps, this.currentChar);
     }
   }
   function parseFactor(){
-    if(this.currentCode == "("){
+    if(this.currentChar == "("){
+      this.validateChar("(")
       this.parseExpression();
       this.validateChar(")")
     }else{
@@ -89,6 +95,9 @@ var Js = (function(){
         throw "No operation exists for value: " + value;
       }
     }
+  }
+  function isAddOp(value){
+    return Object.keys(this.factorOps).indexOf(value) != -1;
   }
   //OPS
   function add(){
