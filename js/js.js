@@ -11,10 +11,12 @@ var Js = (function(){
   function bind(js){
     js.setOps = setOps.bind(js);
     js.evaluate = evaluate.bind(js);
+    js.parseIdentifier = parseIdentifier.bind(js);
     js.parseTerm = parseTerm.bind(js);
     js.parseFactor = parseFactor.bind(js);
     js.parseExpression = parseExpression.bind(js);
     js.getNumber = getNumber.bind(js);
+    js.getName = getName.bind(js);
     js.readChar = readChar.bind(js);
     js.validateChar = validateChar.bind(js);
     js.add = add.bind(js);
@@ -50,9 +52,11 @@ var Js = (function(){
   }
   function parseFactor(){
     if(this.currentChar == "("){
-      this.validateChar("(")
+      this.validateChar("(");
       this.parseExpression();
-      this.validateChar(")")
+      this.validateChar(")");
+    }else if(isAlpha(this.currentChar)){
+      this.parseIdentifier();
     }else{
       this.currentCode += "SET:V0," + this.getNumber() + "\n";
     }
@@ -62,6 +66,16 @@ var Js = (function(){
     while(Object.keys(this.termOps).indexOf(this.currentChar) != -1){
       this.currentCode += "STACK_PUSH:V0\n";
       map(this.termOps, this.currentChar);
+    }
+  }
+  function parseIdentifier(){
+    var name = this.getName();
+    if(this.currentChar = "("){
+      this.validateChar("(");
+      this.validateChar(")");
+      this.currentCode += "CALL:#" + name + "\n";
+    }else{
+      this.currentCode += "SET:V0,#" + name + "\n";
     }
   }
   function readChar(){
@@ -75,6 +89,14 @@ var Js = (function(){
     this.readChar();
     return thisNum;
   }
+  function getName(){
+    if(!isAlpha(this.currentChar)){
+      throw "expected variable but got: " + this.currentChar;
+    }
+    var thisName = this.currentChar;
+    this.readChar();
+    return thisName;
+  }
   function validateChar(value){
     if(this.currentChar != value){
       throw "Expected: " + value + " but got: " + this.currentChar;
@@ -84,6 +106,9 @@ var Js = (function(){
   }
   function isNumber(str){
     return !isNaN(str);
+  }
+  function isAlpha(str){
+    return /^[a-zA-Z]+$/.test(str);
   }
   function map(map, value){
     if(map[value]){

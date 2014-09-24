@@ -5,7 +5,7 @@ test("Js parses single expression", function(){
   equal(js.currentCode, "SET:V0,1\n");
 });
 test("Js parses single expression, with error", function(){
-  var js = Js.create("A");
+  var js = Js.create("%");
   throws(function(){
     js.evaluate();
   });
@@ -44,4 +44,14 @@ test("Js parses unary operators (plus)", function(){
   var js = Js.create("+(2+1)");
   js.evaluate();
   equal(js.currentCode, "SET:V0,0\nSTACK_PUSH:V0\nSET:V0,2\nSTACK_PUSH:V0\nSET:V0,1\nADD:STACK_POP,V0\nADD:STACK_POP,V0\n");
+});
+test("Js parses variable", function(){
+  var js = Js.create("X+1");
+  js.evaluate();
+  equal(js.currentCode, "SET:V0,#X\nSTACK_PUSH:V0\nSET:V0,1\nADD:STACK_POP,V0\n");
+});
+test("Js parses function call", function(){
+  var js = Js.create("1+F()");
+  js.evaluate();
+  equal(js.currentCode, "SET:V0,1\nSTACK_PUSH:V0\nCALL:#F\nADD:STACK_POP,V0\n");
 });
